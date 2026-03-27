@@ -472,17 +472,90 @@ class WechatArticleShotPlugin(Star):
         paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
         for paragraph in paragraphs:
             current = ""
-            for ch in paragraph:
+            index = 0
+            length = len(paragraph)
+
+            while index < length:
+                ch = paragraph[index]
+
+                if not current and ch.isspace():
+                    index += 1
+                    continue
+
                 test = current + ch
                 if self._text_width(test, font) <= max_width:
                     current = test
-                else:
-                    if current:
-                        lines.append(current)
+                    index += 1
+                    continue
+
+                if not current:
                     current = ch
+                    index += 1
+
+                next_char = paragraph[index] if index < length else ""
+
+                if next_char and self._is_closing_punctuation(next_char):
+                    if self._text_width(current + next_char, font) <= max_width:
+                        current += next_char
+                        index += 1
+
+                current = current.rstrip()
+                if current:
+                    lines.append(current)
+
+                current = ""
+                while index < length and paragraph[index].isspace():
+                    index += 1
+
+                while index < length and self._is_closing_punctuation(paragraph[index]) and lines:
+                    lines[-1] += paragraph[index]
+                    index += 1
+
+            current = current.rstrip()
             if current:
                 lines.append(current)
-        return lines or [""]
+
+        return self._optimize_wrapped_lines(lines, font, max_width) or [""]
+
+    def _optimize_wrapped_lines(self, lines: list[str], font: Any, max_width: int) -> list[str]:
+        if not lines:
+            return lines
+
+        optimized: list[str] = []
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            if optimized:
+                while line and self._is_closing_punctuation(line[0]):
+                    candidate = optimized[-1] + line[0]
+                    if self._text_width(candidate, font) <= max_width:
+                        optimized[-1] = candidate
+                        line = line[1:]
+                    else:
+                        break
+
+            if optimized and self._ends_with_opening_punctuation(optimized[-1]) and line:
+                last_char = optimized[-1][-1]
+                candidate = optimized[-1][:-1] + line[0]
+                if self._text_width(candidate, font) <= max_width:
+                    optimized[-1] = candidate
+                    line = last_char + line[1:]
+
+            if line:
+                optimized.append(line)
+
+        return optimized
+
+    def _is_closing_punctuation(self, ch: str) -> bool:
+        return ch in "，。！？；：、,.!?;:)]}》】〉」』”’％%"
+
+    def _is_opening_punctuation(self, ch: str) -> bool:
+        return ch in "([<{《【〈「『“‘"
+
+    def _ends_with_opening_punctuation(self, text: str) -> bool:
+        return bool(text) and self._is_opening_punctuation(text[-1])
 
     def _text_width(self, text: str, font: Any) -> int:
         try:
