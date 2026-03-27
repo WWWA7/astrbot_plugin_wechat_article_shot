@@ -273,8 +273,22 @@ class WechatArticleShotPlugin(Star):
             logger.error(f"[wechat_article_shot] 获取文章页面失败: {e}")
             return None
 
-        response.encoding = response.apparent_encoding or response.encoding or "utf-8"
-        soup = BeautifulSoup(response.text, "html.parser")
+        html_bytes = response.content
+        html_text = None
+
+        for encoding in ("utf-8", "utf-8-sig", response.encoding, response.apparent_encoding, "gb18030"):
+            if not encoding:
+                continue
+            try:
+                html_text = html_bytes.decode(encoding, errors="strict")
+                break
+            except Exception:
+                continue
+
+        if html_text is None:
+            html_text = html_bytes.decode("utf-8", errors="ignore")
+
+        soup = BeautifulSoup(html_text, "html.parser")
 
         title = self._extract_first_text(
             soup,
@@ -409,18 +423,26 @@ class WechatArticleShotPlugin(Star):
             candidates.extend(
                 [
                     "C:/Windows/Fonts/msyhbd.ttc",
+                    "C:/Windows/Fonts/msyhbd.ttf",
+                    "C:/Windows/Fonts/SourceHanSansSC-Bold.otf",
                     "C:/Windows/Fonts/simhei.ttf",
+                    "C:/Windows/Fonts/simsun.ttc",
                     "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
                     "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+                    "/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc",
                 ]
             )
         else:
             candidates.extend(
                 [
                     "C:/Windows/Fonts/msyh.ttc",
+                    "C:/Windows/Fonts/msyh.ttf",
+                    "C:/Windows/Fonts/SourceHanSansSC-Regular.otf",
                     "C:/Windows/Fonts/simsun.ttc",
+                    "C:/Windows/Fonts/simhei.ttf",
                     "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
                     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+                    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
                 ]
             )
 
@@ -431,10 +453,15 @@ class WechatArticleShotPlugin(Star):
         for path in candidates:
             try:
                 if Path(path).exists():
+                    logger.info(f"[wechat_article_shot] 使用字体: {path}")
                     return ImageFont.truetype(path, size=size)
             except Exception:
                 pass
-        return ImageFont.load_default()
+
+        logger.error(
+            "[wechat_article_shot] 未找到可用中文字体，请在配置中设置 font_path，例如 C:/Windows/Fonts/msyh.ttc"
+        )
+        raise RuntimeError("未找到可用中文字体，请在插件配置中设置 font_path")
 
     def _wrap_text(self, text: str, font: Any, max_width: int) -> list[str]:
         text = self._clean_article_text(text)
