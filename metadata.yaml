@@ -1,0 +1,6 @@
+name: wechat_article_shot
+desc: 自动识别群聊中的微信公众号文章链接或卡片，提取正文内容并生成本地长图发送回群内
+help: 群内发送微信公众号文章链接或分享卡片后，插件会自动提取标题、作者、正文文字和图片，在本地生成长图并回传
+version: v1.2.0
+author: WWWA7
+repo: https://github.com/WWWA7/astrbot_plugin_wechat_article_shot

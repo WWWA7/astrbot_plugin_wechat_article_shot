@@ -1,0 +1,128 @@
+{
+  "enabled": {
+    "description": "启用插件",
+    "type": "bool",
+    "hint": "关闭后将不再自动识别群聊中的微信公众号文章链接或卡片",
+    "default": true
+  },
+  "dedupe_ttl_seconds": {
+    "description": "去重时间（秒）",
+    "type": "int",
+    "hint": "同一篇文章在去重时间内不会重复处理发送",
+    "default": 300
+  },
+  "dedupe_scope": {
+    "description": "去重范围",
+    "type": "string",
+    "hint": "可选 group_url、group_url_sender、global_url",
+    "default": "group_url"
+  },
+  "http_timeout_seconds": {
+    "description": "文章抓取超时（秒）",
+    "type": "int",
+    "hint": "请求公众号文章与正文图片时的超时时间",
+    "default": 20
+  },
+  "image_quality": {
+    "description": "JPEG 图片质量",
+    "type": "int",
+    "hint": "范围建议 70-95，数值越大越清晰但体积越大",
+    "default": 90
+  },
+  "local_canvas_width": {
+    "description": "本地长图宽度",
+    "type": "int",
+    "hint": "输出长图宽度，建议 800-1080",
+    "default": 900
+  },
+  "local_padding": {
+    "description": "本地长图边距",
+    "type": "int",
+    "hint": "卡片四周内边距",
+    "default": 48
+  },
+  "local_line_spacing": {
+    "description": "正文行间距",
+    "type": "int",
+    "hint": "正文文本行间距",
+    "default": 16
+  },
+  "local_section_gap": {
+    "description": "段落间距",
+    "type": "int",
+    "hint": "不同文本段落之间的额外间距",
+    "default": 28
+  },
+  "local_image_gap": {
+    "description": "图片间距",
+    "type": "int",
+    "hint": "正文图片与前后内容的间距",
+    "default": 20
+  },
+  "local_max_images": {
+    "description": "正文最大图片数量",
+    "type": "int",
+    "hint": "最多下载并绘制的正文图片数量，避免过长和过慢",
+    "default": 6
+  },
+  "local_max_blocks": {
+    "description": "正文最大内容块数量",
+    "type": "int",
+    "hint": "最多处理的文本/图片块总数，避免超长文章过慢",
+    "default": 120
+  },
+  "font_path": {
+    "description": "自定义字体文件路径",
+    "type": "string",
+    "hint": "可选。指定后优先使用该字体渲染中文",
+    "default": ""
+  },
+  "local_background_color": {
+    "description": "长图背景色",
+    "type": "string",
+    "hint": "整张图片背景色，如 #F7F8FA",
+    "default": "#F7F8FA"
+  },
+  "local_card_color": {
+    "description": "正文卡片背景色",
+    "type": "string",
+    "hint": "正文卡片背景色，如 #FFFFFF",
+    "default": "#FFFFFF"
+  },
+  "local_text_color": {
+    "description": "正文字体颜色",
+    "type": "string",
+    "hint": "正文主文字颜色，如 #1F2329",
+    "default": "#1F2329"
+  },
+  "local_sub_text_color": {
+    "description": "辅助文字颜色",
+    "type": "string",
+    "hint": "作者、时间、原文链接等辅助文字颜色",
+    "default": "#667085"
+  },
+  "local_divider_color": {
+    "description": "分隔线颜色",
+    "type": "string",
+    "hint": "卡片分隔线颜色",
+    "default": "#E5E7EB"
+  },
+  "capture_failed_message": {
+    "description": "处理失败提示",
+    "type": "string",
+    "hint": "当公众号文章处理失败时发送到群里的提示文本",
+    "default": "公众号文章处理失败，请稍后重试。"
+  },
+  "send_error_tip": {
+    "description": "发送详细错误提示",
+    "type": "bool",
+    "hint": "开启后会在群里返回具体错误信息，便于排查问题",
+    "default": false
+  },
+  "blocked_sender_ids": {
+    "description": "屏蔽用户列表",
+    "type": "list",
+    "hint": "列表中的 QQ 号发送公众号链接时不会触发自动处理",
+    "default": []
+  }
+}
